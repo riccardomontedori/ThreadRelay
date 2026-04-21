@@ -29,7 +29,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
         setSize(800, 500);
         setLayout(new BorderLayout(5, 5));
 
-        // 1. PANNELLO CENTRALE (Le 4 corsie)
+        
         JPanel pnlCentrale = new JPanel(new GridLayout(4, 1, 0, 5));
         pnlCentrale.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -38,16 +38,16 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             pnlCentrale.add(corsie[i]);
         }
 
-        // 2. PANNELLO INFERIORE (Controlli)
+        
         JPanel pnlSud = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         
-        JComboBox<String> comboVelocita = new JComboBox<>(new String[]{"Slow", "Medium", "Fast"});
+        JComboBox<String> comboVelocita = new JComboBox<>(new String[]{"Lento", "Medio", "Veloce"});
         JButton btnAvvia = new JButton("Avvia");
         JButton btnSospende = new JButton("Sospende");
         JButton btnRiprende = new JButton("Riprende");
         JButton btnFerma = new JButton("Ferma");
 
-        // Stato iniziale dei bottoni (come da tua immagine)
+        
         btnSospende.setEnabled(false);
         btnRiprende.setEnabled(false);
         btnFerma.setEnabled(false);
@@ -65,7 +65,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
    private class CorsiaAtleta extends JPanel {
         private JPanel areaCorsa;
         private JLabel lblStato;
-        private int posizioneX = 10; // Posizione iniziale del punto
+        private int posizioneX = 10;
         private Color colorePunto;
 
         public CorsiaAtleta(String nome, Color colore) {
@@ -73,7 +73,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             setLayout(new BorderLayout());
             setBorder(new LineBorder(Color.DARK_GRAY, 1));
 
-            // Parte Sinistra: Area dove si muove il punto
+           
             areaCorsa = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
