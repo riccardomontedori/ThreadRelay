@@ -13,23 +13,25 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class InterfacciaAtleta extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(InterfacciaAtleta.class.getName());
 
     /**
      * Creates new form InterfacciaAtleta
      */
-    
     private CorsiaAtleta[] corsie = new CorsiaAtleta[4];
     private Color[] coloriAtleti = {Color.RED, Color.YELLOW, Color.GREEN, Color.CYAN};
-    
-   public InterfacciaAtleta() {
+    private GestoreGara gestore = new GestoreGara();
+    private Timer timerGrafico;
+    private JButton btnAvvia, btnSospende, btnRiprende, btnFerma;
+    private JComboBox<String> comboVelocita;
+
+    public InterfacciaAtleta() {
         super("Relay Runners");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
         setLayout(new BorderLayout(5, 5));
 
-        
         JPanel pnlCentrale = new JPanel(new GridLayout(4, 1, 0, 5));
         pnlCentrale.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -38,16 +40,14 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             pnlCentrale.add(corsie[i]);
         }
 
-        
         JPanel pnlSud = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        
+
         JComboBox<String> comboVelocita = new JComboBox<>(new String[]{"Lento", "Medio", "Veloce"});
         JButton btnAvvia = new JButton("Avvia");
         JButton btnSospende = new JButton("Sospende");
         JButton btnRiprende = new JButton("Riprende");
         JButton btnFerma = new JButton("Ferma");
 
-        
         btnSospende.setEnabled(false);
         btnRiprende.setEnabled(false);
         btnFerma.setEnabled(false);
@@ -60,9 +60,68 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
 
         add(pnlCentrale, BorderLayout.CENTER);
         add(pnlSud, BorderLayout.SOUTH);
+
+        timerGrafico = new Timer(50, e -> {
+            for (int i = 0; i < 4; i++) {
+                if (gestore.atleti[i] != null) {
+                    int cont = gestore.atleti[i].conteggio;
+
+                    corsie[i].aggiornaPosizione(cont * 6, String.valueOf(cont));
+
+                    if (i == 3 && cont >= 99) {
+                        resetUI();
+                    }
+                }
+            }
+        });
+
+        btnAvvia.addActionListener(e -> {
+            String liv = (String) comboVelocita.getSelectedItem();
+            int ms = liv.equals("Lento") ? 100 : liv.equals("Medio") ? 50 : 20;
+
+            btnAvvia.setEnabled(false);
+            comboVelocita.setEnabled(false);
+            btnSospende.setEnabled(true);
+            btnFerma.setEnabled(true);
+
+            gestore.preparaGara(ms);
+            gestore.avvia();
+            timerGrafico.start();
+        });
+
+        btnSospende.addActionListener(e -> {
+            gestore.pausa(true);
+            btnSospende.setEnabled(false);
+            btnRiprende.setEnabled(true);
+        });
+
+        btnRiprende.addActionListener(e -> {
+            gestore.pausa(false);
+            btnSospende.setEnabled(true);
+            btnRiprende.setEnabled(false);
+        });
+
+        btnFerma.addActionListener(e -> {
+            gestore.stop();
+            resetUI();
+            for (int i = 0; i < 4; i++) {
+                corsie[i].aggiornaPosizione(10, "0");
+            }
+        });
     }
-   
-   private class CorsiaAtleta extends JPanel {
+
+    private void resetUI() {
+        timerGrafico.stop();
+        btnAvvia.setEnabled(true);
+        comboVelocita.setEnabled(true);
+        btnSospende.setEnabled(false);
+        btnRiprende.setEnabled(false);
+        btnFerma.setEnabled(false);
+
+    }
+
+    private class CorsiaAtleta extends JPanel {
+
         private JPanel areaCorsa;
         private JLabel lblStato;
         private int posizioneX = 10;
@@ -73,7 +132,6 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             setLayout(new BorderLayout());
             setBorder(new LineBorder(Color.DARK_GRAY, 1));
 
-           
             areaCorsa = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -81,13 +139,12 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
                     Graphics2D g2 = (Graphics2D) g;
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2.setColor(colorePunto);
-                
+
                     g2.fillOval(posizioneX, getHeight() / 2 - 10, 20, 20);
                 }
             };
             areaCorsa.setBackground(new Color(235, 235, 235));
 
-         
             JPanel pnlInfo = new JPanel(new GridLayout(1, 2));
             pnlInfo.setPreferredSize(new Dimension(200, 0));
             pnlInfo.setBackground(new Color(215, 225, 245));
@@ -108,11 +165,10 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             add(pnlInfo, BorderLayout.EAST);
         }
 
-       
         public void aggiornaPosizione(int x, String stato) {
             this.posizioneX = x;
             this.lblStato.setText(stato);
-            repaint(); 
+            repaint();
         }
     }
 
