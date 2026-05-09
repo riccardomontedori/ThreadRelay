@@ -1,19 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package threadrelay;
 
-/**
- *
- * @author montedori.riccardo
- */
 public class GestoreGara {
     public Atleta[] atleti = new Atleta[4];
+    private Observer interfacciaGrafica;
+
+    public GestoreGara(Observer observer) {
+        this.interfacciaGrafica = observer;
+    }
 
     public void preparaGara(int msVelocita) {
         for (int i = 0; i < 4; i++) {
-            atleti[i] = new Atleta(i + 1, msVelocita, this);
+            atleti[i] = new Atleta(i + 1, msVelocita);
+            atleti[i].addObserver(interfacciaGrafica);
         }
         
         atleti[0].setProssimoAtleta(atleti[1]);
@@ -33,7 +31,10 @@ public class GestoreGara {
 
     public void stop() {
         for (Atleta a : atleti) {
-            if (a != null) a.inEsecuzione = false;
+            if (a != null) {
+                a.inEsecuzione = false;
+                a.interrupt();
+            }
         }
     }
 }

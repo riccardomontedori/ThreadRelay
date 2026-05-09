@@ -12,7 +12,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
-public class InterfacciaAtleta extends javax.swing.JFrame {
+public class InterfacciaAtleta extends JFrame implements Observer{
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(InterfacciaAtleta.class.getName());
 
@@ -21,8 +21,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
      */
     private CorsiaAtleta[] corsie = new CorsiaAtleta[4];
     private Color[] coloriAtleti = {Color.RED, Color.YELLOW, Color.GREEN, Color.CYAN};
-    private GestoreGara gestore = new GestoreGara();
-    private Timer timerGrafico;
+    private GestoreGara gestore = new GestoreGara(this);
     private JButton btnAvvia, btnSospende, btnRiprende, btnFerma;
     private JComboBox<String> comboVelocita;
 
@@ -61,20 +60,6 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
         add(pnlCentrale, BorderLayout.CENTER);
         add(pnlSud, BorderLayout.SOUTH);
 
-        timerGrafico = new Timer(50, e -> {
-            for (int i = 0; i < 4; i++) {
-                if (gestore.atleti[i] != null) {
-                    int cont = gestore.atleti[i].conteggio;
-
-                    corsie[i].aggiornaPosizione(cont * 6, String.valueOf(cont));
-
-                    if (i == 3 && cont >= 99) {
-                        resetUI();
-                    }
-                }
-            }
-        });
-
         btnAvvia.addActionListener(e -> {
             String liv = (String) comboVelocita.getSelectedItem();
             int ms = liv.equals("Lento") ? 100 : liv.equals("Medio") ? 50 : 20;
@@ -86,7 +71,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
 
             gestore.preparaGara(ms);
             gestore.avvia();
-            timerGrafico.start();
+
         });
 
         btnSospende.addActionListener(e -> {
@@ -109,9 +94,20 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
             }
         });
     }
+    
+    @Override
+    public void update(int valore, int id) {
+        java.awt.EventQueue.invokeLater(() -> {
+            corsie[id - 1].aggiornaPosizione(valore * 6, String.valueOf(valore));
+
+            if (id == 4 && valore >= 99) {
+                resetUI();
+                javax.swing.JOptionPane.showMessageDialog(this, "Gara terminata!");
+            }
+        });
+    }
 
     private void resetUI() {
-        timerGrafico.stop();
         btnAvvia.setEnabled(true);
         comboVelocita.setEnabled(true);
         btnSospende.setEnabled(false);
@@ -119,6 +115,7 @@ public class InterfacciaAtleta extends javax.swing.JFrame {
         btnFerma.setEnabled(false);
 
     }
+
 
     private class CorsiaAtleta extends JPanel {
 
