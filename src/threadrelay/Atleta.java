@@ -40,7 +40,7 @@ public class Atleta extends Thread implements Subject {
 
     @Override
     public void run() {
-        while (conteggio < 100 && inEsecuzione) {
+        while (conteggio < 100 && inEsecuzione && !isInterrupted()) {
             if (!inPausa) {
                 conteggio++;
                 notifyObservers();
@@ -57,7 +57,9 @@ public class Atleta extends Thread implements Subject {
             } else {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
         }
     }

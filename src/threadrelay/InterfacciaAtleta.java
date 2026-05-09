@@ -12,7 +12,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
-public class InterfacciaAtleta extends JFrame implements Observer{
+public class InterfacciaAtleta extends JFrame implements Observer {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(InterfacciaAtleta.class.getName());
 
@@ -89,12 +89,13 @@ public class InterfacciaAtleta extends JFrame implements Observer{
         btnFerma.addActionListener(e -> {
             gestore.stop();
             resetUI();
+
             for (int i = 0; i < 4; i++) {
                 corsie[i].aggiornaPosizione(10, "0");
             }
         });
     }
-    
+
     @Override
     public void update(int valore, int id) {
         java.awt.EventQueue.invokeLater(() -> {
@@ -115,7 +116,6 @@ public class InterfacciaAtleta extends JFrame implements Observer{
         btnFerma.setEnabled(false);
 
     }
-
 
     private class CorsiaAtleta extends JPanel {
 
